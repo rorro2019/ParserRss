@@ -22,6 +22,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.Valid;
 import java.io.*;
 import java.util.List;
 import java.util.Optional;
@@ -103,6 +104,33 @@ public class RssController {
             String exep= e.getMessage() ;
           //  Translate.setHttpReferrer("http://code.google.com/p/google-api-translate-java/");
            // String resultad= Translate.translate(e.getLocalizedMessage(), Language.ENGLISH , Language.SPANISH);
+            return ResponseEntity.badRequest()
+                    .body("Archivo incorrecto, descripcion: "+ exep);
+        }
+    }
+
+    @PostMapping("/parserString")
+    public ResponseEntity<String> uploadString(@RequestBody String result) throws Exception {
+        try {
+
+
+            /**verifico la primer linea si es valida**/
+            Boolean xmlval= this.validarXml(result);
+            //control para etiquetas desconocidas
+          //  RSSFeedParser parser = new RSSFeedParser(result);
+           // Boolean feed = parser.readFeed();
+
+            Serializer serializer = new Persister();
+            Rss rss = serializer.read(Rss.class, result);
+
+            if ( xmlval==true){
+                return ResponseEntity.ok("Archivo con errores ");
+            }
+            return ResponseEntity.ok("Archivo correcto ");
+        } catch (Exception e) {
+            String exep= e.getMessage() ;
+            //  Translate.setHttpReferrer("http://code.google.com/p/google-api-translate-java/");
+            // String resultad= Translate.translate(e.getLocalizedMessage(), Language.ENGLISH , Language.SPANISH);
             return ResponseEntity.badRequest()
                     .body("Archivo incorrecto, descripcion: "+ exep);
         }
