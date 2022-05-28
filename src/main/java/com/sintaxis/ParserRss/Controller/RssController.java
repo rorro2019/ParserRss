@@ -1,7 +1,6 @@
 package com.sintaxis.ParserRss.Controller;
 
-import com.apptastic.rssreader.Item;
-import com.apptastic.rssreader.RssReader;
+//import com.apptastic.rssreader.RssReader;
 import com.sintaxis.ParserRss.Model.Rss;
 import com.sintaxis.ParserRss.Model.Xml;
 import com.sintaxis.ParserRss.Service.RSSFeedParser;
@@ -32,7 +31,7 @@ public class RssController {
     public ResponseEntity<String> upload(@RequestParam("file") MultipartFile file) throws Exception {
         try {
              InputStream inputStream = new ByteArrayInputStream(file.getBytes());
-             RssReader reader = new RssReader();
+             //RssReader reader = new RssReader();
          /**   Stream<Item> rssFeed = reader.read(inputStream);
                List<Item> articles = rssFeed.filter(i -> i.getTitle().equals(Optional.of("RSS")))
                       .collect(Collectors.toList());
