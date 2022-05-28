@@ -203,11 +203,6 @@ if [ -z "$BASE_DIR" ]; then
   exit 1;
 fi
 
-String cp = Optional.ofNullable(System.getProperty("java.class.path"))
-				.filter(String::isEmpty)
-				.map(c -> c + ":")
-				.orElse("");
-System.setProperty("java.class.path", cp + "/absolute/path/to/antlr-4.9.3-complete.jar");
 
 ##########################################################################################
 # Extension to allow automatically downloading the maven-wrapper.jar from Maven-central
