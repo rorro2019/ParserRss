@@ -4,10 +4,8 @@ import org.simpleframework.xml.Element;
 import org.simpleframework.xml.Namespace;
 import org.simpleframework.xml.Root;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
+
 import java.net.URL;
-import java.net.URLConnection;
 
 /**
  * Clase que representa la etiqueta <item> del feed

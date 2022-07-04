@@ -3,12 +3,9 @@ package com.sintaxis.ParserRss.Model;
 import org.simpleframework.xml.Element;
 import org.simpleframework.xml.ElementList;
 import org.simpleframework.xml.Root;
-//import org.hibernate.validator.constraints.URL;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
+
 import java.net.URL;
-import java.net.URLConnection;
+
 import java.util.List;
 
 /**

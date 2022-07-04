@@ -5,12 +5,6 @@ import org.simpleframework.xml.Element;
 import org.simpleframework.xml.Namespace;
 import org.simpleframework.xml.Root;
 
-/**
- * Creado por Hermosa Programación
- *
- * Clase que representa al elemento <rss> del feed
- */
-
 @Root(name = "rss", strict = false)
 @Namespace(reference="http://search.yahoo.com/mrss/")
 public class Rss {

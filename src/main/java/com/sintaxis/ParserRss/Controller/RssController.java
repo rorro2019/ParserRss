@@ -1,8 +1,7 @@
 package com.sintaxis.ParserRss.Controller;
 
 //import com.apptastic.rssreader.RssReader;
-import com.sintaxis.ParserRss.Model.Rss;
-import com.sintaxis.ParserRss.Model.Xml;
+import com.sintaxis.ParserRss.Model.*;
 import com.sintaxis.ParserRss.Service.RSSFeedParser;
 import org.simpleframework.xml.Serializer;
 import org.simpleframework.xml.core.Persister;
@@ -10,15 +9,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.validation.Valid;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 import java.io.*;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.Scanner;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-import static org.apache.juli.FileHandler.DEFAULT_BUFFER_SIZE;
 
 @RestController
 @RequestMapping("/api/rss")
@@ -28,7 +26,8 @@ public class RssController {
 
 
     @PostMapping("/parser")
-    public ResponseEntity<String> upload(@RequestParam("file") MultipartFile file) throws Exception {
+    public Response upload(@RequestParam("file") MultipartFile file) throws Exception {
+        Response response= new Response();
         try {
              InputStream inputStream = new ByteArrayInputStream(file.getBytes());
              //RssReader reader = new RssReader();
@@ -42,8 +41,9 @@ public class RssController {
              String result = s.hasNext() ? s.next() : "";
              String extension= this.obtenerExtension(file.getOriginalFilename()).trim().toLowerCase();
              if ( !extension.equals("rss")){
-                  return ResponseEntity.badRequest()
-                        .body("Archivo incorrecto, Error en la extension");
+
+                  response.setRespuesta("Archivo incorrecto, Error en la extension");
+                 return  response ;
              }
 
             /**verifico la primer linea si es valida**/
@@ -57,16 +57,69 @@ public class RssController {
             Rss rss = serializer.read(Rss.class, result);
 
             if (feed==true || xmlval==true){
-                return ResponseEntity.ok("Archivo con errores ");
+                response.setRespuesta("Archivo con errores ");
+                return  response ;
             }
-            return ResponseEntity.ok("Archivo correcto ");
+
+            Html html= this.parsearHtml(rss);
+            response.setRespuesta("Archivo correcto ");
+            String htmlString = this.convertirString(html);
+            htmlString = htmlString.replace("\n", "");
+            response.setHtml(htmlString);
+            return  response ;
+
         } catch (Exception e) {
             String exep= e.getMessage() ;
           //  Translate.setHttpReferrer("http://code.google.com/p/google-api-translate-java/");
            // String resultad= Translate.translate(e.getLocalizedMessage(), Language.ENGLISH , Language.SPANISH);
-            return ResponseEntity.badRequest()
-                    .body("Archivo incorrecto, descripcion: "+ exep);
+            response.setRespuesta("Archivo incorrecto, descripcion: "+ exep);
+            return  response ;
         }
+    }
+
+    public String convertirString(Html html){
+        String xmlString = "";
+        try {
+            JAXBContext context = JAXBContext.newInstance(Html.class);
+            Marshaller m = context.createMarshaller();
+
+            m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE); // To format XML
+
+            StringWriter sw = new StringWriter();
+            m.marshal(html, sw);
+            xmlString = sw.toString();
+
+        } catch (JAXBException e) {
+            e.printStackTrace();
+        }
+
+        return xmlString;
+    }
+
+    public  Html parsearHtml(Rss rss){
+        Html html= new Html();
+        Head head= new Head();
+        Body body= new Body();
+        //head
+        head.setTitle(rss.getChannel().getTitle());
+        //body
+        body.setH1(rss.getChannel().getTitle());
+        body.setH3(rss.getChannel().getDescripcion());
+        List<Li> ul= new ArrayList();
+
+        for (int i=0; i < rss.getChannel().getItems().size(); i++) {
+                Li li= new Li();
+                A a= new A();
+                a.setH4(rss.getChannel().getItems().get(i).getTitle());
+                a.setHref(rss.getChannel().getItems().get(i).getLink().getHost());
+                li.setA(a);
+                li.setP(rss.getChannel().getItems().get(i).getDescripcion());
+                ul.add(li);
+            }
+        body.setUl(ul);
+        html.setBody(body);
+        html.setHead(head);
+        return html;
     }
 
     @PostMapping("/parserString")
